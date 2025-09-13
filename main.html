@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paperclip Page</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #f4f4f4;
+    color: #333;
+    min-height: 100vh;
+  }
+
+  .page {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    padding: 40px;
+    box-sizing: border-box;
+  }
+
+  .active { display: flex; }
+
+  /* Boring Page */
+  h1 { color: #444; font-size: 32px; margin-bottom: 24px; }
+  p { line-height: 1.6; font-size: 18px; margin-bottom: 16px; }
+
+  .secret {
+    display: inline-block;
+    cursor: text;
+    color: inherit;
+    font-weight: inherit;
+    text-decoration: none;
+    padding: 0;
+  }
+  .secret:hover { color: inherit; }
+
+  /* Cool Page */
+  .cool {
+    background: linear-gradient(135deg,#7c3aed,#2563eb);
+    color: #fff;
+    width: 100%;
+    min-height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 40px;
+    position: relative;
+  }
+
+  .cool h1 {
+    font-size: 48px;
+    animation: glow 2s infinite alternate;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  @keyframes glow {
+    from { text-shadow: 0 0 10px #fff,0 0 20px #7c3aed,0 0 30px #2563eb; }
+    to { text-shadow: 0 0 20px #fff,0 0 40px #7c3aed,0 0 60px #2563eb; }
+  }
+
+  .prank-list {
+    font-size: 20px;
+    margin-top: 20px;
+    line-height: 1.8;
+    max-width: 600px;
+    text-align: left;
+  }
+
+  .add-prank {
+    margin-top: 30px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .add-prank input {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+  }
+
+  .add-prank button {
+    padding: 10px 16px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    background: #fff;
+    color: #2563eb;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s;
+  }
+
+  .add-prank button:hover { transform: scale(1.05); }
+
+  .back-btn {
+    margin-top: 40px;
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    background: #fff;
+    color: #2563eb;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s;
+  }
+
+  .back-btn:hover { transform: scale(1.1); }
+
+  /* Pop animation for new prank */
+  .pop {
+    animation: pop 0.4s ease-out;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Boring Paperclip Page -->
+<div id="boring" class="page active">
+  <h1>The History of Paperclips</h1>
+  <p>The <span class="secret">marvel</span> of paperclips allows them to hold sheets of paper together without <span class="secret">damaging</span> them.</p>
+  <p>Take a moment to appreciate their <span class="secret">elegance</span>. They were <span class="secret">invented</span> long ago, and their <span class="secret">history</span> is fascinating.</p>
+  <p>Although <span class="secret">boring</span> to some, the paperclip is actually a marvel of simple design.</p>
+</div>
+
+<!-- Cool Page -->
+<div id="cool" class="page cool">
+  <h1>🎉 Welcome to the Cool Page! 🎉</h1>
+  <ul class="prank-list" id="prankList"></ul>
+
+  <div class="add-prank">
+    <input type="text" id="newPrank" placeholder="Add your prank here..." />
+    <button onclick="addPrank()">Add</button>
+  </div>
+
+  <button class="back-btn" onclick="showPage('boring')">ABORT!</button>
+</div>
+
+<script>
+// Secret word sequence (new password)
+const sequence = ["marvel", "damaging", "elegance", "invented", "history"];
+let progress = 0;
+
+// Initial pranks JSON
+let pranks = [
+  "Swap the salt with sugar for a breakfast surprise.",
+  "Put a small piece of tape over the bottom of a computer mouse sensor.",
+  "Put a tiny piece of clear tape over the TV remote sensor.",
+  "Set a fake 'Out of Order' sign on the office printer.",
+  "Place a sticky note under a coworker’s mouse so it won’t track.",
+  "Freeze a friend’s keys in a block of ice.",
+  "Fill a balloon with confetti and tape it above a door.",
+  "Switch keyboard keys around for a funny typing surprise.",
+  "Use food coloring in a toothpaste tube (harmless!).",
+  "Cover a doorway with plastic wrap at eye height."
+];
+
+// Populate initial pranks
+function loadPranks() {
+  const list = document.getElementById('prankList');
+  list.innerHTML = '';
+  pranks.forEach(prank => {
+    const li = document.createElement('li');
+    li.textContent = prank;
+    list.appendChild(li);
+  });
+}
+loadPranks();
+
+// Detect secret word clicks
+document.querySelectorAll('.secret').forEach(word => {
+  word.addEventListener('click', () => {
+    if(word.textContent === sequence[progress]){
+      progress++;
+      if(progress === sequence.length){
+        showPage('cool'); // Reveal the cool page
+      }
+    } else {
+      progress = 0; // Reset if wrong
+    }
+  });
+});
+
+// Show selected page
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Add prank dynamically
+function addPrank(){
+  const input = document.getElementById('newPrank');
+  const text = input.value.trim();
+  if(text){
+    pranks.push(text); // add to JSON
+    const li = document.createElement('li');
+    li.textContent = text;
+    li.classList.add('pop'); // apply pop animation
+    document.getElementById('prankList').appendChild(li);
+    input.value = '';
+  }
+}
+</script>
+
+</body>
+</html>
